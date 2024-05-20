@@ -1,0 +1,2 @@
+class HttpKernel():
+    pass
