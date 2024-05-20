@@ -36,6 +36,6 @@ def serve(**args):
     if '--port' not in params:
         params += ['--port', config('app.port')]
         
-    print(['uvicorn', 'ascender:serve']+flags+params)
+    print(['uvicorn', 'dira:serve']+flags+params)
 
-    subprocess.run(['uvicorn', 'ascender:serve']+flags+params)
+    subprocess.run(['uvicorn', 'dira:serve']+flags+params)
