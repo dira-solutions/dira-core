@@ -106,7 +106,11 @@ class ConsoleKernel():
     
     def get_modules(self, module_dir: str):
         import pkgutil
-        packages = importlib.import_module(module_dir)
+        try:
+            packages = importlib.import_module(module_dir)
+        except ModuleNotFoundError:
+            return []
+    
         modules_path = [module_name for _, module_name, _ in pkgutil.iter_modules(packages.__path__, packages.__name__ + ".")]
 
         return modules_path

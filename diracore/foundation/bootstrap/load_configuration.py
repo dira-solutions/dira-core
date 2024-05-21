@@ -3,13 +3,28 @@ import os
 from diracore.contracts.foundation.application import Application
 from pathlib import Path, PosixPath
 
+from pydantic_settings import BaseSettings
+
 class LoadConfiguration:
+    def __init__(self, config_class: BaseSettings = None) -> None:
+        self.config_class = config_class
     
     def bootstrap(self, app: Application):
         _config: dict = {}
-        self.load_config_files(app, _config)
+        if self.config_class:
+            self.load_config_settings_files(app, _config)
+        else:
+            self.load_config_files(app, _config)
+        
         app.singleton("config", _config)
         app.instance("config", _config)
+        
+    def load_config_settings_files(self, app: Application, _config: dict):
+        from diracore.support.config import Config
+        config = Config().model_dump()
+        
+        for key, value in config.items():
+            _config[key] = value
 
 
     def load_config_files(self, app: Application, _config: dict):

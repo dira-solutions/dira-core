@@ -101,6 +101,8 @@ class Application(Container, ApplicationContract):
 
     async def register_configured_providers(self):
         providers = self.make("config").get("app", {}).get("providers", [])
+        if isinstance(providers, tuple):
+            providers = providers[0]
         for provider in providers:
             if inspect.iscoroutinefunction(self.register):
                 await self.register(provider)
