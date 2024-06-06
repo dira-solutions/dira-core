@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import Field, BaseModel
+from pydantic_settings import BaseSettings
+from typing import Any
 
 
-class ConnectionDBConfig(BaseModel):
+class ConnectionDBConfig(BaseSettings):
     url: str = Field(alias='db_url', default=None)
     host: str = Field(alias='db_host', default='127.0.0.1')
     port: str|int = Field(alias='db_port', default='5432')
@@ -19,9 +21,9 @@ class ModelsDBConfig(BaseModel):
     path: list[str] = ["app/entity/"]
 
 
-class DatabaseConfig(BaseModel):
+class DatabaseConfig(BaseSettings):
     default: str = Field(alias='db_connection', default=None)
-    connections: dict[str, ConnectionDBConfig] = Field(default={
-        "pgsql": ConnectionDBConfig()
+    connections: Any = Field(default={
+        "pgsql": Field(default_factory=ConnectionDBConfig)
     })
     models: ModelsDBConfig = ModelsDBConfig()

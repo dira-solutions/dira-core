@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
 
 from .app import AppConfig
 from .database import DatabaseConfig
@@ -11,6 +12,6 @@ class Config(BaseSettings):
         validate_default=False,
         extra='allow'
     )
-    app: AppConfig = AppConfig()
-    database: DatabaseConfig = DatabaseConfig()
-    auth: AuthConfig = AuthConfig()
+    app: AppConfig = Field(default_factory=AppConfig)
+    database: DatabaseConfig = Field(default_factory=DatabaseConfig)
+    auth: AuthConfig = Field(default_factory=AuthConfig)

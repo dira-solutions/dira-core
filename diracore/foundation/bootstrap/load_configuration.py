@@ -20,8 +20,7 @@ class LoadConfiguration:
         app.instance("config", _config)
         
     def load_config_settings_files(self, app: Application, _config: dict):
-        from diracore.support.config import Config
-        config = Config().model_dump()
+        config = self.config_class.model_dump()
         
         for key, value in config.items():
             _config[key] = value

@@ -4,7 +4,8 @@ from diracore.support.auth.middleware import JWTAuthentication
 import os
 from urllib.parse import urlparse
 from typing import List, Dict, Any, Tuple
-from pydantic import BaseModel, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 def default_url():
@@ -19,7 +20,7 @@ def default_url():
     return [__host, __port]
 
 
-class AppConfig(BaseModel):
+class AppConfig(BaseSettings):
     env: str = Field(alias='app_env', default='local')
     url: str = Field(alias='app_url', default='localhost')
     host: str = Field(alias='app_host', default=default_url()[0])
