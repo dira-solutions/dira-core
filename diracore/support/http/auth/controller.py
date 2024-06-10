@@ -1,10 +1,10 @@
 from .form import *
 from app.entity.user import User
-from app.entity.user import PersonalAccessToken
+from app.entity.personal_access_token import PersonalAccessToken
 
 from fastapi import HTTPException
-from diracore.support.auth.middleware import JWTAuthentication
-from diracore.support.auth.resource import *
+from diracore.support.http.auth.middleware import JWTAuthentication
+from diracore.support.http.auth.resource import *
 from diracore.main import app
 from tortoise.expressions import Q
 

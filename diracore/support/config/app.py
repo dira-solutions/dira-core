@@ -1,5 +1,5 @@
 from diracore.support.service_provider import ServiceProvider
-from diracore.support.auth.middleware import JWTAuthentication
+from diracore.support.http.auth.middleware import JWTAuthentication
 
 import os
 from urllib.parse import urlparse

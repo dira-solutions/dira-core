@@ -263,7 +263,6 @@ class AscJob(Job):
             job._success_callback_timeout = on_success.timeout
 
         if on_failure:
-            print('on_failure\n\n\n\n', on_failure)
             if not (isinstance(on_failure, Callback) or isinstance(on_failure, AscCallback)):
                 warnings.warn(
                     'Passing a string or function for `on_failure` is deprecated, pass `Callback` instead',

@@ -1,8 +1,8 @@
 from diracore.foundation.application import Application
-from diracore.console.cli_ascender import AscernderCLI 
+from diracore.console.cli import AscernderCLI, coro
 import click
 
-app = Application()
+app: Application = Application()
 
 @click.group(cls=AscernderCLI, help="main CLI command for lazy example",)
 def cli():

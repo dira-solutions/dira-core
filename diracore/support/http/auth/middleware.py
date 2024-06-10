@@ -1,12 +1,14 @@
 from fastapi import HTTPException, status
 from fastapi.security import HTTPBearer
-from fastapi import Depends
+from fastapi import Depends, Request
 from jose import JWTError, jwt
 from typing import Any
 from datetime import datetime, timedelta
 from tortoise.models import Model
-from app.entity.user import PersonalAccessToken, User
+from app.entity.user import User
+from app.entity.personal_access_token import PersonalAccessToken
 from .form import UserLoginRequestForm
+from fastapi import Request
 
 import bcrypt
 from diracore.contracts.foundation.application import Application
@@ -22,7 +24,7 @@ class JWTAuthentication():
         return self
     
     def handle(self):  
-        async def get_current_user(token = Depends(HTTPBearer())):
+        async def get_current_user(request: Request, token = Depends(HTTPBearer())):
             try:
                 payload = self.decode(token.credentials)
                 user_id: str = payload.get("id")
@@ -41,7 +43,9 @@ class JWTAuthentication():
             user = await self.user_model.where_actual_token(token.credentials).get_or_none(id=user_id)
             if user is None:
                 raise HTTPException(status_code=404, detail="User not found")
-            return user      
+            request.scope["user"] = user
+            return user
+        
         return get_current_user
 
     async def authenticate_user(self, form: UserLoginRequestForm) -> User:
@@ -49,21 +53,20 @@ class JWTAuthentication():
             user: User = await User.get_or_none(username=form.username)
         elif form.email:
             user: User = await User.get_or_none(email=form.email)
-        is_password = bcrypt.checkpw(form.password.encode(), user.password.encode())
-        if not user and not is_password:
+        if not user or not bcrypt.checkpw(form.password.encode(), user.password.encode()):
             raise HTTPException(status_code=404, detail="Account not found. Please check your credentials and try again.")
         return user
 
     async def create_access_token(self, user_id, data: dict, name=None, type='bearer') -> PersonalAccessToken:
         to_encode = data.copy()
-        expire = datetime.utcnow() + timedelta(minutes=self.token_expire_minutes)
+        expire = datetime.now() + timedelta(minutes=self.token_expire_minutes)
         to_encode.update({"exp": expire})
 
         token_count = await PersonalAccessToken.filter(user_id=user_id).active().count()
         name = name if name else f"Token-{token_count}"
 
         encoded_jwt = jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
-        now = datetime.utcnow()
+        now = datetime.now()
         token = await PersonalAccessToken.create(
             user_id=user_id,
             name=name,

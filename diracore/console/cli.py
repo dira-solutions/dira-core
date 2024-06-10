@@ -1,6 +1,22 @@
-
 import importlib
 import click
+import asyncio
+from tortoise import Tortoise
+from functools import wraps
+
+def coro(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        loop = asyncio.get_event_loop()
+
+        # Close db connections at the end of all but the cli group function
+        try:
+            loop.run_until_complete(f(*args, **kwargs))
+        finally:
+            if f.__name__ not in ["cli", "init"]:
+                loop.run_until_complete(Tortoise.close_connections())
+
+    return wrapper
 
 class AscernderCLI(click.Group):
     def __init__(self, *args, load_subcommands=None, **kwargs):

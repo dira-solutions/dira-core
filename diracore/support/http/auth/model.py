@@ -15,13 +15,13 @@ class User(Model):
     class QuerySet(QuerySet):
         def where_actual_token(self, token: str):
             return self.filter(
-                Q(personal_access_tokens__credentials=token) &
-                (Q(personal_access_tokens__expires_at__gt=datetime.now()) | Q(personal_access_tokens__expires_at__isnull=True))
+                Q(tokens__credentials=token) &
+                (Q(tokens__expires_at__gt=datetime.now()) | Q(tokens__expires_at__isnull=True))
             )
 
 class PersonalAccessToken(Model):
     id=fields.IntField(pk=True)
-    user=fields.ForeignKeyField('models.User')
+    user=fields.ForeignKeyField('models.User', related_name='tokens')
     name=fields.CharField(max_length=256)
 
     credentials=fields.CharField(max_length=256)

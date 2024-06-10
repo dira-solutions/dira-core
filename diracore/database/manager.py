@@ -1,5 +1,8 @@
 from diracore.contracts.foundation.application import Application
 from tortoise import Tortoise
+from tortoise.contrib.fastapi import register_tortoise
+from diracore.contracts.kernel import Kernel
+from diracore.foundation.http.http_kernel import HttpKernel
 
 class InvalidArgumentException(Exception):
     pass
@@ -56,19 +59,23 @@ class DatabaseManager():
                 self.make_connection(database), self.get_db_name(name))
         return self._connections[name]
     
-    async def configure(self, connecton, db_type: str):
+    async def configure(self, connecton: dict, db_type: str):
         if (db_type == "sqlite"):
-            obj = await Tortoise.init(
-                db_url=db_type+'://{url}'.format(**connecton),
-                modules={'models': self._models}
-            )
+            db_url=db_type+'://{url}'.format(**connecton),
+            modules={'models': self._models},
         else:
-            obj = await Tortoise.init(
-                db_url=db_type+'://{username}:{password}@{host}:{port}/{database}'.format(**connecton),
-                modules={'models': self._models},
-            )
+            db_url=db_type+'://{username}:{password}@{host}:{port}/{database}'.format(**connecton),
+            modules={'models': self._models},
         
-        await Tortoise.generate_schemas()
+        obj = await Tortoise.init(
+            db_url=db_url[0],
+            modules=modules[0]
+        )
+        kernel = self._app.make(Kernel)
+        if isinstance(kernel, HttpKernel):
+            register_tortoise(kernel.server, db_url=db_url, modules=modules)
+        
+        # await Tortoise.generate_schemas()
         return Tortoise.get_connection('default')
     
     def transaction(self, name: str = None):

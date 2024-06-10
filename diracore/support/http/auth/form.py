@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, validator, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 class UserLoginRequestForm(BaseModel):
     username: str | None = None
@@ -20,7 +20,7 @@ class UserRegisterRequestForm(BaseModel):
     email: EmailStr
     password: str
 
-    @validator('password')
+    @field_validator('password')
     def password_requirements(cls, v):
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters long')

@@ -6,7 +6,7 @@ from diracore.foundation.bootstrap import (
     boot_providers, 
     connection_database
 )
-from diracore.console.cli_ascender import AscernderCLI
+from diracore.console.cli import AscernderCLI
 from diracore.main import cli
 
 import asyncio
