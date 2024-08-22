@@ -47,7 +47,7 @@ class AuthenticationController:
         user = await User.create(
             username=request_form.username or f"User-{random.randint(1, 99999):04d}",
             email=request_form.email,
-            password=bcrypt.hashpw(request_form.password.encode(), bcrypt.gensalt()).decode()
+            password=request_form.password
         )
 
         jwt: JWTAuthentication = app.make(JWTAuthentication)
